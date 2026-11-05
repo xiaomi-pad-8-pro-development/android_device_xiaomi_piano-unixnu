@@ -3,8 +3,56 @@
 [source."AvailabilityVersions"]
 commit = "933f9360f1b70dfbda5548386a3d65e0358b4f7d"
 
+[source."BootProgress"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
 [source."IOStorageFamily"]
 commit = "e45fbe30a7879e0b16e26dddb78538f1b00e0bff"
+
+[source."NativeAES"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."NativeKeyStoreEvents"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."NativeMobileDisplay"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."NativePrelink"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."NativeRamBlock"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."NativeUfs"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."NativeVirtioBlock"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."PaganiArmCpu"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."PaganiArmDTPlatform"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."PaganiDarwinBoot"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."PaganiInput"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."PaganiPanel"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."PaganiVerifiedRoot"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."ShengPlatformPower"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
+
+[source."Stage7Probe"]
+commit = "c888efd3ce1b817d13f28783a77cf689cb2255c9"
 
 [source."corecrypto-2023"]
 commit = "11fba65b12d8830630e248dfa8344caf8b065f26"
