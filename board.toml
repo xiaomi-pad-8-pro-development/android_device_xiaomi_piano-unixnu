@@ -6,7 +6,6 @@ schema_version = 2
 # GPU come later, following the OnePlus 13T port (IssacL04/UniXNU-Pagani_SM8750).
 
 [board]
-example = true
 name = "piano"
 soc = "SM8750"
 soc_source = "sm8750"

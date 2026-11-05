@@ -5,15 +5,14 @@
     model = "Xiaomi Pad 8 Pro";
     compatible = "xiaomi,piano", "qcom,sm8750";
 
-    // High RAM: REQUIRED from the piano live DTB (/sys/firmware/fdt).
-    // The 13T value is <9 0x80000000 1 0x80000000>.
+    // Contiguous high RAM from the piano live DTB (/sys/firmware/fdt):
+    // 0x980000000, 6 GiB. DarwinBoot allocates its own 4 GiB window.
     memory@980000000 {
         device_type = "memory";
         reg = <9 0x80000000 1 0x80000000>;
     };
 
-    // From the piano UEFI memory map (xbl_config): SMEM and the AOP
-    // region holding the command database match the 13T.
+    // From the piano live DTB: aop_cmd_db_region and smem_region.
     reserved-memory {
         #address-cells = <2>;
         #size-cells = <2>;
