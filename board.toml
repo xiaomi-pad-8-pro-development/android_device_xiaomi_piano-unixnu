@@ -1,0 +1,68 @@
+schema_version = 2
+
+# Xiaomi Pad 8 Pro (piano), SM8750. First stage: our Mu-Silicium UEFI hands
+# over to DarwinBoot from a RAM payload (fastboot boot, nothing flashed) and
+# XNU prints its verbose boot log on the UEFI framebuffer. Storage, touch and
+# GPU come later, following the OnePlus 13T port (IssacL04/UniXNU-Pagani_SM8750).
+
+[board]
+example = true
+name = "piano"
+soc = "SM8750"
+soc_source = "sm8750"
+os_profile = "ipados-17.7.11-21H461"
+description = "Xiaomi Pad 8 Pro: first XNU boot from RAM"
+kit = "piano"
+
+[ipsw]
+fetch = ["AppleLogo", "KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustCache"]
+
+[components]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "NativeRamBlock"]
+
+[kernel]
+defconfig = "piano_defconfig"
+config_fragments = ["arch:configs/common.config", "soc:configs/sm8750.config", "os:configs/ipados.config"]
+patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "os:patches/xnu/series", "device:patches/xnu/series"]
+
+[device_tree]
+source = "device:dts/piano.dts"
+include_dirs = ["soc:dts"]
+
+[firmware]
+# Our UEFI (android_device_xiaomi_piano-uefi, branch unixnu) with UniXNU,
+# UniXNUDxe, DarwinBoot and UniXNURamDiskDxe added to pianoPkg.
+config = "piano"
+dsc = "Platforms/Xiaomi/pianoPkg/piano.dsc"
+fd = "Build/pianoPkg/{target}_CLANGPDB/FV/SILICIUM_UEFI.fd"
+packages = ["{uefi}", "{uefi}/Platforms/Xiaomi", "{tree}/package", "{tree}/drivers/DarwinBoot", "{edk2}", "{uefi}/Common/Mu", "{uefi}/Silicon/Qualcomm", "{uefi}/Silicon/Silicium"]
+
+[firmware.defines]
+DEVICE_MODEL = "piano"
+UNIXNU = "1"
+
+[bootimg]
+# The piano ABL loads the boot image ramdisk on fastboot boot.
+embed_payload = true
+
+[payload]
+volume = "UNIXNUPIANO"
+size_mib = 160
+loader = "firmware"
+title = "Xiaomi Pad 8 Pro: XNU first boot"
+timeout = 10
+# One CPU until the boot log reaches the root mount; the 13T port runs eight.
+kernel_args = ["-v", "serial=0", "debug=0x14e", "cpus=1"]
+
+[package]
+unixnu = "../UniXNU"
+
+[package.defconfig]
+"ipados-17.7.11-21H461" = "piano_defconfig"
+
+[payload.adt]
+ipad_identity = true
+unique_chip_id = "required"
+chip_id = "0x8011"
+# DarwinBoot allocates its own 4 GiB window, as on the 13T.
+owned_memory_size = "0x100000000"
