@@ -12,13 +12,14 @@ soc = "SM8750"
 soc_source = "sm8750"
 os_profile = "ipados-17.7.11-21H461"
 description = "Xiaomi Pad 8 Pro: first XNU boot from RAM"
-kit = "piano"
+# The Pagani display and input build scripts read the package as kits/oneplus13t.
+kit = "oneplus13t"
 
 [ipsw]
 fetch = ["AppleLogo", "KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustCache"]
 
 [components]
-include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "GopFramebuffer", "BootProgress", "ShengPlatformPower"]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "GopFramebuffer", "BootProgress", "ShengPlatformPower", "NativeUfs", "NativeVirtioBlock", "NativeRamBlock", "PaganiVerifiedRoot", "NativeMobileDisplay", "Stage7Probe", "NativeKeyStoreEvents", "PaganiInput", "PaganiPanel"]
 
 [kernel]
 defconfig = "piano_defconfig"
@@ -30,7 +31,13 @@ archives = [
   "component:ArmDTPlatform",
   "component:SoftwareAES",
   "build-software-aes-bindings.py",
+  "component:NativeUfs",
+  "build-ufs-storage-bindings.py --kernelcache ../../../../ipsw/21H461/kernelcache.decompressed",
+  "component:NativeVirtioBlock",
+  "component:NativeRamBlock",
   "component:ShengPlatformPower",
+  "build-pagani-verified-root-probe.py --component os --include-systemos",
+  "component:NativeMobileDisplay",
   "build-boot-progress.py",
   "build-mockfs-fixture.py",
 ]
@@ -45,6 +52,7 @@ tool = "kits/XnuPrelink/emit_prelink.py"
 kernel = "build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf"
 kernelcache_sha256 = "f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7"
 slide = "-0x1000000"
+early_security_init = "com.apple.driver.AppleMobileFileIntegrity=0xfffffff005ab4ae0"
 roots = [
   "com.apple.iokit.IOStorageFamily", "com.apple.filesystems.apfs",
   "com.apple.driver.AppleMobileFileIntegrity", "com.apple.kext.CoreTrust",
@@ -96,7 +104,8 @@ loader = "firmware"
 title = "Xiaomi Pad 8 Pro: XNU first boot"
 timeout = 10
 # One CPU until the boot log reaches the root mount; the 13T port runs eight.
-kernel_args = ["-v", "serial=0", "debug=0x14e", "cpus=1", "sheng-pmgr=2"]
+kernel_args = ["-v", "serial=0", "debug=0x14e", "cpus=1", "sheng-pmgr=2", "native-ufs-root=1", "native-ufs-diagnostics=1", "offline-apfs-load=1", "pagani-ramoops=1", "pagani-ramoops-pa=0xa3600000", "pagani-ramoops-console=0x100000", "pagani-ramoops-pmsg=0x200000", "sheng-vsync=60", "sheng-vsync-fixed=1", "offline-mobile-graphics-load=1", "offline-legacy-register=1", "offline-legacy-phase=4", "offline-legacy-gop=1", "offline-legacy-pm=1", "offline-legacy-validate=1", "offline-legacy-transfer=1", "offline-legacy-cpu-present=1", "sheng-aks=1", "offline-key-events=1", "-no_corpses", "kt_fixed_zones=240", "startup_debug=0"]
+trust_cache_sha256 = ["7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7"]
 
 [package]
 unixnu = "../UniXNU"
@@ -110,3 +119,18 @@ unique_chip_id = "required"
 chip_id = "0x8011"
 # DarwinBoot allocates its own 4 GiB window, as on the 13T.
 owned_memory_size = "0x100000000"
+packed_data_ramdisk = true
+# The APFS root volume of the 21H461 OS image (profile [root] os_volume_uuid).
+root_match_volume_uuid = "04769D26-2CA0-4825-B443-E2E5F88300F2"
+
+# iPadOS root: GPT entry unixnu on LUN 0 (sda36), 32 GiB split from the old
+# 64 GiB linux partition on 2026-11-05. NativeUfs finds it by name.
+[userdata]
+partition = "unixnu"
+first_lba = 107643392
+last_lba = 116031999
+lba_bytes = 4096
+windows = [
+  { name = "OS", component = "OS" },
+  { name = "SystemOS", component = "Cryptex1,SystemOS" },
+]

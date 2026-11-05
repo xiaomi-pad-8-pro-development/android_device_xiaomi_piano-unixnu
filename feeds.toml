@@ -17,3 +17,48 @@ local = "modules/Pagani/drivers/BootProgress"
 name = "ShengPlatformPower"
 kind = "driver"
 local = "modules/Pagani/drivers/ShengPlatformPower"
+
+[[source]]
+name = "NativeUfs"
+kind = "driver"
+local = "modules/Pagani/drivers/NativeUfs"
+
+[[source]]
+name = "NativeVirtioBlock"
+kind = "driver"
+local = "modules/Pagani/drivers/NativeVirtioBlock"
+
+[[source]]
+name = "NativeRamBlock"
+kind = "driver"
+local = "modules/Pagani/drivers/NativeRamBlock"
+
+[[source]]
+name = "PaganiVerifiedRoot"
+kind = "kit"
+local = "modules/Pagani/kits/PaganiVerifiedRoot"
+
+[[source]]
+name = "NativeMobileDisplay"
+kind = "driver"
+local = "modules/Pagani/drivers/NativeMobileDisplay"
+
+[[source]]
+name = "Stage7Probe"
+kind = "driver"
+local = "modules/Pagani/drivers/Stage7Probe"
+
+[[source]]
+name = "NativeKeyStoreEvents"
+kind = "driver"
+local = "modules/Pagani/drivers/NativeKeyStoreEvents"
+
+[[source]]
+name = "PaganiInput"
+kind = "driver"
+local = "modules/Pagani/drivers/PaganiInput"
+
+[[source]]
+name = "PaganiPanel"
+kind = "driver"
+local = "modules/Pagani/drivers/PaganiPanel"
