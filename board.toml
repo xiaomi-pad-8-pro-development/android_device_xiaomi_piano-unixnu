@@ -18,7 +18,7 @@ kit = "piano"
 fetch = ["AppleLogo", "KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustCache"]
 
 [components]
-include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "GopFramebuffer"]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "GopFramebuffer", "BootProgress"]
 
 [kernel]
 defconfig = "piano_defconfig"
@@ -30,6 +30,7 @@ archives = [
   "component:ArmDTPlatform",
   "component:SoftwareAES",
   "build-software-aes-bindings.py",
+  "build-boot-progress.py",
   "build-mockfs-fixture.py",
 ]
 config_fragments = ["arch:configs/common.config", "soc:configs/sm8750.config", "os:configs/ipados.config"]
@@ -65,9 +66,10 @@ FD_BLOCKS = "0x300"
 UNIXNU = "1"
 
 [bootimg]
-# The payload goes in as the boot image ramdisk; UniXNURamDiskDxe finds it.
-# Our BootShim has no embedded-payload support.
-embed_payload = false
+# ABL swaps the boot image ramdisk on fastboot boot, so the payload rides
+# in the kernel field after the firmware volume; pianoPkg PianoPayloadDxe
+# points /chosen initrd at it for UniXNURamDiskDxe.
+embed_payload = true
 
 [payload]
 volume = "UNIXNUPIANO"

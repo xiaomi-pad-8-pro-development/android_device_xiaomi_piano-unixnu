@@ -3,3 +3,11 @@ name = "sm8750"
 kind = "soc"
 git = "https://github.com/IssacL04/UniXNU-sm8750-common.git"
 commit = "feaa135df4763e3c19a155402e6b17b124a12e13"
+
+# The 13T early screen console, from the pinned modules/Pagani checkout. The
+# catalog entry links the whole repository instead of drivers/BootProgress.
+[[source]]
+name = "BootProgress"
+kind = "driver"
+local = "modules/Pagani/drivers/BootProgress"
+

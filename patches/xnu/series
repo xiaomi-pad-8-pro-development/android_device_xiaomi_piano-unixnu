@@ -1,1 +1,2 @@
 # piano XNU patches, applied after the arch, SoC and OS series.
+early-boot-progress.patch
