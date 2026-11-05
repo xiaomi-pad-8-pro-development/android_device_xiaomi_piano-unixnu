@@ -11,3 +11,9 @@ name = "BootProgress"
 kind = "driver"
 local = "modules/Pagani/drivers/BootProgress"
 
+
+# The 13T PMGR nub for AMFI (sheng-pmgr=2), same checkout.
+[[source]]
+name = "ShengPlatformPower"
+kind = "driver"
+local = "modules/Pagani/drivers/ShengPlatformPower"

@@ -18,7 +18,7 @@ kit = "piano"
 fetch = ["AppleLogo", "KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustCache"]
 
 [components]
-include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "GopFramebuffer", "BootProgress"]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "GopFramebuffer", "BootProgress", "ShengPlatformPower"]
 
 [kernel]
 defconfig = "piano_defconfig"
@@ -30,11 +30,29 @@ archives = [
   "component:ArmDTPlatform",
   "component:SoftwareAES",
   "build-software-aes-bindings.py",
+  "component:ShengPlatformPower",
   "build-boot-progress.py",
   "build-mockfs-fixture.py",
 ]
 config_fragments = ["arch:configs/common.config", "soc:configs/sm8750.config", "os:configs/ipados.config"]
 patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "os:patches/xnu/series", "device:patches/xnu/series"]
+
+# Apple kexts packed with the kernel, as on the OnePlus 13T. AMFI is needed
+# by trust_cache_init; ApplePMGR gets its nub from ShengPlatformPower
+# (sheng-pmgr=2), otherwise AMFI panics "No PMGR?" at setconf.
+[kernel.prelink]
+tool = "kits/XnuPrelink/emit_prelink.py"
+kernel = "build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf"
+kernelcache_sha256 = "f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7"
+slide = "-0x1000000"
+roots = [
+  "com.apple.iokit.IOStorageFamily", "com.apple.filesystems.apfs",
+  "com.apple.driver.AppleMobileFileIntegrity", "com.apple.kext.CoreTrust",
+  "com.apple.security.sandbox", "com.apple.driver.ApplePMGR",
+  "com.apple.AppleFSCompression.AppleFSCompressionTypeZlib",
+  "com.apple.iokit.IOSurface", "com.apple.iokit.IOMobileGraphicsFamily",
+  "com.apple.iokit.IOHIDFamily", "com.apple.iokit.IOHIDEventDriver",
+]
 
 [device_tree]
 source = "device:dts/piano.dts"
@@ -78,7 +96,7 @@ loader = "firmware"
 title = "Xiaomi Pad 8 Pro: XNU first boot"
 timeout = 10
 # One CPU until the boot log reaches the root mount; the 13T port runs eight.
-kernel_args = ["-v", "serial=0", "debug=0x14e", "cpus=1"]
+kernel_args = ["-v", "serial=0", "debug=0x14e", "cpus=1", "sheng-pmgr=2"]
 
 [package]
 unixnu = "../UniXNU"

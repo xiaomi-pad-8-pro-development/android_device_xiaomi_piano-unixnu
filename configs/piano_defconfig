@@ -13,3 +13,4 @@ CONFIG_XNU_DT_PANIC_REGION=y
 # Early screen console and RAM log (13T BootProgress): shows how far XNU gets.
 CONFIG_XNU_BOOT_PROGRESS=y
 CONFIG_XNU_EARLY_BOOT_PROGRESS=y
+CONFIG_XNU_SHENG_PMGR=y
