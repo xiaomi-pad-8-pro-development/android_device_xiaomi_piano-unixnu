@@ -1,0 +1,31 @@
+#!/bin/sh
+# Re-apply the piano fixes that live outside this repository after every
+# `./unixnu fetch` (a refetch restores the upstream copies).
+#
+#   scripts/apply-local-fixes.sh <UniXNU checkout, e.g. UniXNU-sm8750>
+set -eu
+here=$(cd "$(dirname "$0")/.." && pwd)
+unixnu=${1:?UniXNU checkout}
+
+apply() {  # <dir> <patch>
+	if git -C "$1" apply --reverse --check "$2" 2>/dev/null; then
+		echo "already applied: $(basename "$2") in $1"
+	else
+		git -C "$1" apply "$2" && echo "applied: $(basename "$2") in $1"
+	fi
+}
+
+# SID 0x60 takeover for NativeUfs, in the fetched SM8750 common feed.
+for feed in "$unixnu"/out/feeds/UniXNU-sm8750-common-*; do
+	[ -d "$feed" ] && apply "$feed" "$here/patches/local/sm8750-common-smmu-piano.patch"
+done
+
+# Stage 7 display: NativeGOPPresenter is linked once, not twice.
+apply "$unixnu" "$here/patches/local/sm8750-stage7-display-once.patch"
+
+# launchd needs the original 21H461 trust cache (sha256 below, same bundle as
+# the OnePlus 13T). Without it: "pid=1 launchd exec MAC policy REFUSED".
+want=7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7
+grep -q '^trust_cache *=' "$unixnu/unixnu.local.toml" 2>/dev/null ||
+	echo "missing: set trust_cache in $unixnu/unixnu.local.toml to original-trust.bin" \
+	     "(UniXNU-Pagani_SM8750/scripts/prepare-original-trust.py, sha256 $want)"

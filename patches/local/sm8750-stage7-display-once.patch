@@ -1,0 +1,14 @@
+diff --git a/scripts/build-stage7-display.py b/scripts/build-stage7-display.py
+index 1823134..24cb510 100644
+--- a/scripts/build-stage7-display.py
++++ b/scripts/build-stage7-display.py
+@@ -200,7 +200,8 @@ def code(data,info):
+     sec=next(s for g in info['segments'] for s in g['sections'] if s['name']=='__text');return data[sec['fileoff']:sec['fileoff']+sec['size']]
+ require(code(raw,image)==code(late.read_bytes(),macho(late.read_bytes())),'Only owned initializer section registration changes')
+ objects=[late,OUT/'original-bindings.o']
+-for component in ('Stage7Probe','NativeKeyStoreEvents','NativeGOPPresenter'):
++# NativeGOPPresenter is compiled and added below (display_object); listing it here too linked it twice.
++for component in ('Stage7Probe','NativeKeyStoreEvents'):
+     print(run(['python3',ROOT/'scripts/build-stage7-driver.py',component],text=True),end='')
+     directory=ROOT/'build'/('native-keystore-events' if component=='NativeKeyStoreEvents' else 'native-legacy-display')
+     source_obj=directory/(component+'.o')

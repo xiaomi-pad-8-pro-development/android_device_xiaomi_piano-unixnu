@@ -1,0 +1,13 @@
+diff --git a/kits/Sm8750Platform/SmmuTakeover.h b/kits/Sm8750Platform/SmmuTakeover.h
+index 364aae8..26aba5e 100644
+--- a/kits/Sm8750Platform/SmmuTakeover.h
++++ b/kits/Sm8750Platform/SmmuTakeover.h
+@@ -67,6 +67,8 @@ static UfsSmmuPlan planUfsSmmuBank(uint16_t stream, uint64_t dma, uint64_t bytes
+ #if defined(NATIVE_UFS_SM8750) && NATIVE_UFS_SM8750
+       // PKX110 firmware leaves SID 0x60 on bank 0; redirect only its exact entry.
+       usable = usable || (stream == 0x60 && s2cr == 0);
++      // piano (Xiaomi firmware) leaves its own SID 0x60 entry (mask/bank vary); take it over.
++      if (stream == 0x60) { usable = true; mask = 0; }
+ #endif
+       if (matches > 1 || mask || !usable) {
+         p.slot = i; p.smr = smr; p.s2cr = s2cr;
