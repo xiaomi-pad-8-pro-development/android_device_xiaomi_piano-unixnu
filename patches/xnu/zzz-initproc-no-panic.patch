@@ -1,0 +1,32 @@
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -1699,6 +1699,29 @@
+ proc_should_trigger_panic(proc_t p, int rv)
+ {
++	/* Bring-up: watchdogd cannot run on this port -- its exec exits immediately with namespace 2
++	 * subcode 5 -- and a service exit is routed to the initproc panic below, which stops the whole
++	 * boot before the UI is up. The job is disabled in the Data seed as well; naming it here keeps
++	 * the boot independent of boot-argument parsing. */
++	if (strncmp(p->p_name, "watchdogd", 9) == 0) {
++		printf("watchdogd exit ignored (bring-up)\n");
++		return false;
++	}
++
++	/* Bring-up: a service that launchd starts is adopted as initproc on this port, and the initproc
++	 * branch below panics unconditionally -- so a single failing service stops the whole boot. This
++	 * check runs first so panic_on_crash_disabled covers those exits as well. */
++	if (panic_on_crash_disabled) {
++		printf("critical exit without panic (panic_on_crash_disabled)\n");
++		return false;
++	}
++
+ 	if (p == initproc) {
+ 		/* Always panic for launchd */
++		/* Same reason: initproc-no-panic=1 keeps the boot going for one failing service. */
++		unsigned noPanic = 0;
++		if (PE_parse_boot_argn("initproc-no-panic", &noPanic, sizeof(noPanic)) && noPanic) {
++			printf("initproc exit without panic (initproc-no-panic=1)\n");
++			return false;
++		}
+ 		return true;
+ 	}

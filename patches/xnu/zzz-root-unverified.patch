@@ -1,0 +1,22 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -1097,6 +1097,19 @@
+ 				native_owner_root_checkpoint(autherr, owner, device);
+ 			}
+ #endif
++			{
++				// Bring-up: root-unverified=1 accepts a mounted root whose APFS seal was not
++				// authenticated (the storage windows are published without an owner policy
++				// envelope). Everything else about the mount path is unchanged.
++				int root_unverified = 0;
++				extern int PE_parse_boot_argn(const char *, void *, int);
++				if (!owner_authorized &&
++				    PE_parse_boot_argn("root-unverified", &root_unverified, sizeof(root_unverified)) &&
++				    root_unverified) {
++					owner_authorized = 1;
++					boot_progress_stage("root unverified accepted (root-unverified=1)");
++				}
++			}
+ 			if (autherr && !owner_authorized) {
+ 				panic("rootvp not authenticated after mounting");
+ 			}

@@ -1,0 +1,21 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -7659,8 +7659,16 @@
+ 	if (!root_authorized) goto done;
+ 	native_owner_cache_stage = 1;
+ 	boot_progress_root("SystemOS volume query enter", volume, 0);
+-	if (!native_verified_block_volume_device(volume, &selected, device_path,
+-	    sizeof(device_path))) goto done;
++	/* Bring-up: the SystemOS volume media is published asynchronously while APFS probes the
++	 * second storage window, so wait for it instead of failing initproc's exec. */
++	for (int volume_attempt = 0; ; volume_attempt++) {
++		if (native_verified_block_volume_device(volume, &selected, device_path,
++		    sizeof(device_path))) {
++			break;
++		}
++		if (volume_attempt >= 60) goto done;
++		delay(250);
++	}
+ 	strlcpy(native_owner_cache_device_path, device_path, sizeof(native_owner_cache_device_path));
+ 	native_owner_cache_selected_device = selected;
+ 	native_owner_cache_stage = 2;
