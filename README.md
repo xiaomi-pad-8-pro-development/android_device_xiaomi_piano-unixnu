@@ -10,9 +10,15 @@
 
 ## State
 
-Experimental, not booted yet. The first goal is XNU's verbose boot log on
-the screen from a RAM boot: `fastboot boot` only, nothing is flashed and
-Android stays as it was.
+Experimental. From a RAM boot (`fastboot boot`, nothing flashed) XNU mounts
+the iPadOS root from the `unixnu` UFS partition and launchd runs; there is
+no picture after the boot log yet (no GPU driver).
+
+## Layout
+
+iPadOS and macOS share the hardware half of this repository; see
+[docs/LAYOUT.md](docs/LAYOUT.md). After every `./unixnu fetch`, run
+`scripts/apply-local-fixes.sh <UniXNU checkout>`.
 
 ## Build
 
