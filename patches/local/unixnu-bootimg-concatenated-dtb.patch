@@ -1,0 +1,19 @@
+diff --git a/scripts/unixnu/bootimg.py b/scripts/unixnu/bootimg.py
+index de568f8..440ffa8 100644
+--- a/scripts/unixnu/bootimg.py
++++ b/scripts/unixnu/bootimg.py
+@@ -91,7 +91,13 @@ def build(ctx, uefi, fd, dtb, ramdisk=None, output=None):
+         scratch = Path(scratch_name)
+         shim = compile_shim(uefi, base, size, requires_header, scratch)
+         tree = patch_dtb(Path(dtb).read_bytes(), ctx.board.get('bootimg', {}).get('dtb_node', []), scratch)
+-        if tree[:4] != b'\xd0\x0d\xfe\xed' or struct.unpack_from('>I', tree, 4)[0] != len(tree):
++        # One compiled tree, or several back to back (a stock dtb with one tree per SoC and board revision).
++        offset = 0
++        while offset < len(tree):
++            if tree[offset:offset + 4] != b'\xd0\x0d\xfe\xed' or offset + 8 > len(tree):
++                raise Error('invalid compiled device tree')
++            offset += struct.unpack_from('>I', tree, offset + 4)[0]
++        if offset != len(tree):
+             raise Error('invalid compiled device tree')
+         combined = shim + firmware
+         # [bootimg.image] kernel_compression selects the kernel encoding. The

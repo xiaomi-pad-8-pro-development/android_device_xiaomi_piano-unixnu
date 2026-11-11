@@ -23,6 +23,12 @@ done
 # Stage 7 display: NativeGOPPresenter is linked once, not twice.
 apply "$unixnu" "$here/patches/local/sm8750-stage7-display-once.patch"
 
+# UniXNU core (macOS): accept the stock dtb, several compiled trees back to
+# back. Only for the core checkout; the SM8750 fork already does.
+if [ -f "$unixnu/profiles/os/macos-27.3-26C5035r/profile.toml" ]; then
+	apply "$unixnu" "$here/patches/local/unixnu-bootimg-concatenated-dtb.patch"
+fi
+
 # launchd needs the original 21H461 trust cache (sha256 below, same bundle as
 # the OnePlus 13T). Without it: "pid=1 launchd exec MAC policy REFUSED".
 want=7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7

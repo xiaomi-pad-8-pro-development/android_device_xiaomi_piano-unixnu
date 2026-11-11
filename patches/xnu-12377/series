@@ -5,3 +5,7 @@
 # sheng-platform-power.patch: UniXNU/UniXNU-sm8550-common patches/xnu-12377,
 # BSD-2-Clause-Patent. The OS series' boot progress patch builds on it.
 sheng-platform-power.patch
+# kernel-stack-shift.patch: the osfmk/kern/stack.c part of UniXNU/UniXNU-sheng
+# zzzz-sheng-ipados27-bringup.patch (BSD-2-Clause-Patent); XnuPrelink binds
+# AMFI's stack-room reads of the 26C5035r fileset to unixnu_kernel_stack_shift.
+kernel-stack-shift.patch

@@ -13,7 +13,7 @@ import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-LINKS = ('board.toml', 'feeds.toml', 'porting.toml', 'configs', 'dts', 'modules', 'package', 'patches', 'scripts')
+LINKS = ('board.toml', 'feeds.toml', 'porting.toml', 'configs', 'dts', 'modules', 'macos', 'package', 'patches', 'scripts')
 
 
 def main():

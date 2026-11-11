@@ -161,7 +161,7 @@ kit = "piano"
 description = "Xiaomi Pad 8 Pro: macOS first boot from RAM"
 
 [os_overrides."macos-27.3-26C5035r".components]
-include = ["ArmDTPlatform", "ArmCpu", "XnuPrelink", "DarwinBoot", "RamBlock", "GopFramebuffer", "AppleKeyStoreState", "SoftwareAES"]
+include = ["ArmDTPlatform", "ArmCpu", "XnuPrelink", "DarwinBoot", "GopFramebuffer", "AppleKeyStoreState"]
 
 [os_overrides."macos-27.3-26C5035r".kernel]
 defconfig = "piano_macos_defconfig"
@@ -179,9 +179,8 @@ archives = [
   "component:ArmDTPlatform",
   "component:ArmCpu",
   "build-libpthread-kernel.py",
-  "component:RamBlock",
   "component:AppleKeyStoreState",
-  "component:SoftwareAES",
+  "build-piano-macos-glue.py",
 ]
 
 [os_overrides."macos-27.3-26C5035r".payload]
@@ -198,6 +197,5 @@ chip_id = "6050"
 # 6 GiB is the most the 4 KiB bootstrap tables map.
 owned_memory_size = "0x180000000"
 
-[os_overrides."macos-27.3-26C5035r".payload.runtime]
-target = "macos27"
-build = "26C5035r"
+# No [payload.runtime] yet: the macOS userspace runtime and its Data seed
+# come with the root and Data mounts (storage stage).

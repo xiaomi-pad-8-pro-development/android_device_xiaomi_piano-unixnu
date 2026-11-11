@@ -53,3 +53,26 @@ no such bundle yet, so the link ends with undefined symbols:
 Order of work: the storage bundle (UFS on SM8750, then
 `CONFIG_XNU_SOURCE_STORAGE` and the `CONFIG_XNU_OWNER_*` mounts), the display
 script, the SMP patch for xnu-12377, then the GPU, input and USB.
+
+## Build (stage 1)
+
+From a UniXNU core checkout (UniXNU/UniXNU, which has the macOS 27.3 profile):
+
+```sh
+<repo>/scripts/prepare-macos-profile.py
+D=<repo>/.cache/macos-device O="-D $D --out out/piano-macos --os macos-27.3-26C5035r"
+<repo>/scripts/apply-local-fixes.sh .
+./unixnu defconfig piano_macos_defconfig $O
+./unixnu fetch $O
+./unixnu build kernel $O
+./unixnu build package $O
+./unixnu build firmware $O --uefi <piano-uefi>/deps/Mu-Silicium
+./unixnu build payload $O
+./unixnu bootimg $O --dtb <stock dtb>
+```
+
+Stage 1 is the kernel collection from RAM with the boot text on the UEFI
+framebuffer, one CPU. Not in it yet: the UFS root, SystemOS and Data mounts
+(and so the RAM disk and software AES), the display and key event services
+(the Pad 6S Pro builds them in build-gop-legacy-display-27.py), SMP and the GPU.
+`glue/PianoMacGlue.c` holds the board hooks the macOS kernel patches call.
