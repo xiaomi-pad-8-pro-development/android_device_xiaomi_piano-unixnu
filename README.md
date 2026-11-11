@@ -14,6 +14,9 @@ Experimental. From a RAM boot (`fastboot boot`, nothing flashed) XNU mounts
 the iPadOS root from the `unixnu` UFS partition and launchd runs; there is
 no picture after the boot log yet (no GPU driver).
 
+macOS 27.3 has its board tables and compiles, but its kernel does not link
+yet ([macos/README.md](macos/README.md)).
+
 ## Layout
 
 iPadOS and macOS share the hardware half of this repository; see

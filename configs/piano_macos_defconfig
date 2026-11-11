@@ -1,0 +1,15 @@
+# macOS 27.3 kernel configuration (UniXNU core, profiles/os/macos-27.3-26C5035r).
+# CONFIG_XNU_<NAME> becomes XNU_<NAME> for the kernel build script. First
+# stage: RAM boot, boot text on the UEFI framebuffer, no UFS and no GPU.
+CONFIG_XNU_BUILD_ARCHIVES=y
+CONFIG_XNU_DT_PANIC_REGION=y
+CONFIG_XNU_ARMVIRT_PLATFORM=n
+CONFIG_XNU_KERNEL_CHAINED_FIXUPS=y
+# Without a storage driver the RAM disk needs the software AES service and
+# Apple's prelinked corecrypto (the profile's CONFIG_XNU_CRYPTO_BOOTSTRAP).
+CONFIG_XNU_NATIVE_AES=y
+CONFIG_XNU_NATIVE_RAM_BLOCK=y
+# CONFIG_XNU_NATIVE_LEGACY_DISPLAY needs the board display script (board.toml).
+# The root, SystemOS and Data mounts (CONFIG_XNU_OWNER_*) need verified block
+# storage (CONFIG_XNU_SOURCE_STORAGE with a UFS driver); not ported yet.
+# CONFIG_XNU_NATIVE_ADRENO is not set

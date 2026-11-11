@@ -6,12 +6,16 @@ hardware half is shared; each OS adds only what is specific to it.
 | Path | Shared | What |
 | --- | --- | --- |
 | `dts/piano.dts` | yes | Hardware description for the ADT |
-| `board.toml` `[firmware]`, `[bootimg]`, `[userdata]` | yes | Our Mu-Silicium UEFI, RAM boot image, UFS partitions |
+| `board.toml` up to `[os_overrides]` | yes | Our Mu-Silicium UEFI, RAM boot image, UFS partition |
+| `board.toml` `[os_overrides."<profile>"]` | one OS | Components, kernel archives, boot arguments and identity of that system |
 | `modules/`, `package/` | yes | Drivers (UFS, SMMU, power, display, input) |
 | `patches/local/` | yes | Fixes to fetched upstream trees, re-applied by `scripts/apply-local-fixes.sh` |
-| `configs/piano_defconfig` | iPadOS 17.7.11 | Kernel config of the current profile |
-| `board.toml` `[package.defconfig]` | iPadOS | One line per iPadOS profile (17.7.11 now; 26.5.2 and 27.0.1 exist in UniXNU) |
-| `macos/` | macOS | Kernel collection, image and boot argument tooling (UniXNU has no macOS profile) |
+| `configs/piano_defconfig`, `patches/xnu/`, `unixnu.lock` | iPadOS 17.7.11 | Kernel config, patches (xnu-10063) and pins |
+| `configs/piano_macos_defconfig`, `patches/xnu-12377/`, `macos/` | macOS 27.3 | Kernel config, patches (xnu-12377), pins and notes |
+
+`unixnu --os <profile>` selects a system; iPadOS 17.7.11 is the default.
+iPadOS is built by the SM8750 fork of UniXNU with the OnePlus 13T drivers,
+macOS by the UniXNU core, which has the macOS profile.
 
 ## iPadOS profiles
 
@@ -22,7 +26,4 @@ is fetched and the values are measured; nothing is guessed here.
 
 ## macOS
 
-Written here from scratch. Other piano ports are used as references for what
-the hardware needs, but no code is copied from repositories without a
-license. Order: kernel collection and ADT, RAM boot to launchd, then the GPU
-(Adreno 830), USB console and power.
+State, build line and what is missing: [../macos/README.md](../macos/README.md).

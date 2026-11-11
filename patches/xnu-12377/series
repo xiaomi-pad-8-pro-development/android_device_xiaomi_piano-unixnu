@@ -1,0 +1,7 @@
+# SM8750 patches for xnu-12377 (the macOS 27.3 kernel), one per line in
+# application order; applied between the arch and the OS series.
+# UniXNU-sm8750-common has a series for xnu-10063 (iPadOS 17) only.
+#
+# sheng-platform-power.patch: UniXNU/UniXNU-sm8550-common patches/xnu-12377,
+# BSD-2-Clause-Patent. The OS series' boot progress patch builds on it.
+sheng-platform-power.patch

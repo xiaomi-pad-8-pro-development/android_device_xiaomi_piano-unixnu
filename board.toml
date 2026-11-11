@@ -1,9 +1,11 @@
 schema_version = 2
 
-# Xiaomi Pad 8 Pro (piano), SM8750. First stage: our Mu-Silicium UEFI hands
-# over to DarwinBoot from a RAM payload (fastboot boot, nothing flashed) and
-# XNU prints its verbose boot log on the UEFI framebuffer. Storage, touch and
-# GPU come later, following the OnePlus 13T port (IssacL04/UniXNU-Pagani_SM8750).
+# Xiaomi Pad 8 Pro (piano), SM8750, for iPadOS and macOS. Our Mu-Silicium UEFI
+# hands over to DarwinBoot from a RAM payload (fastboot boot, nothing flashed).
+# The tables up to [os_overrides] describe the tablet and are shared; each
+# [os_overrides."<profile>"] table holds what one operating system adds
+# (docs/LAYOUT.md). unixnu --os <profile> selects one; iPadOS 17.7.11 is the
+# default.
 
 [board]
 
@@ -12,55 +14,9 @@ soc = "SM8750"
 soc_source = "sm8750"
 os_profile = "ipados-17.7.11-21H461"
 description = "Xiaomi Pad 8 Pro: first XNU boot from RAM"
-# The Pagani display and input build scripts read the package as kits/oneplus13t.
-kit = "oneplus13t"
-
-[ipsw]
-fetch = ["AppleLogo", "KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustCache"]
-
-[components]
-include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "GopFramebuffer", "BootProgress", "ShengPlatformPower", "NativeUfs", "NativeVirtioBlock", "NativeRamBlock", "PaganiVerifiedRoot", "NativeMobileDisplay", "Stage7Probe", "NativeKeyStoreEvents", "PaganiInput", "PaganiPanel"]
 
 [kernel]
-defconfig = "piano_defconfig"
-archives = [
-  "build-corecrypto-14.py",
-  "build-corecrypto-14.py --namespace",
-  "build-libpthread-kernel.py",
-  "component:ArmCpu",
-  "component:ArmDTPlatform",
-  "component:SoftwareAES",
-  "build-software-aes-bindings.py",
-  "component:NativeUfs",
-  "build-ufs-storage-bindings.py --kernelcache ../../../../ipsw/21H461/kernelcache.decompressed",
-  "component:NativeVirtioBlock",
-  "component:NativeRamBlock", "component:Adreno830", "build-piano-gpu.py",
-  "component:ShengPlatformPower",
-  "build-pagani-verified-root-probe.py --component os --include-systemos",
-  "component:NativeMobileDisplay",
-  "build-boot-progress.py",
-  "build-mockfs-fixture.py",
-]
-config_fragments = ["arch:configs/common.config", "soc:configs/sm8750.config", "os:configs/ipados.config"]
 patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "os:patches/xnu/series", "device:patches/xnu/series"]
-
-# Apple kexts packed with the kernel, as on the OnePlus 13T. AMFI is needed
-# by trust_cache_init; ApplePMGR gets its nub from ShengPlatformPower
-# (sheng-pmgr=2), otherwise AMFI panics "No PMGR?" at setconf.
-[kernel.prelink]
-tool = "kits/XnuPrelink/emit_prelink.py"
-kernel = "build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf"
-kernelcache_sha256 = "f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7"
-slide = "-0x1000000"
-early_security_init = "com.apple.driver.AppleMobileFileIntegrity=0xfffffff005ab4ae0"
-roots = [
-  "com.apple.iokit.IOStorageFamily", "com.apple.filesystems.apfs",
-  "com.apple.driver.AppleMobileFileIntegrity", "com.apple.kext.CoreTrust",
-  "com.apple.security.sandbox", "com.apple.driver.ApplePMGR",
-  "com.apple.AppleFSCompression.AppleFSCompressionTypeZlib",
-  "com.apple.iokit.IOSurface", "com.apple.iokit.IOMobileGraphicsFamily", "com.apple.iokit.IOGPUFamily",
-  "com.apple.iokit.IOHIDFamily", "com.apple.iokit.IOHIDEventDriver",
-]
 
 [device_tree]
 source = "device:dts/piano.dts"
@@ -101,36 +57,147 @@ embed_payload = true
 volume = "UNIXNUPIANO"
 size_mib = 160
 loader = "firmware"
-title = "Xiaomi Pad 8 Pro: XNU first boot"
 timeout = 10
-# One CPU until the boot log reaches the root mount; the 13T port runs eight.
-kernel_args = ["-v", "serial=0", "debug=0x14e", "cpus=8", "sheng-pmgr=2", "native-ufs-root=1", "native-ufs-diagnostics=1", "offline-apfs-load=1", "pagani-ramoops=1", "pagani-ramoops-pa=0xa3600000", "pagani-ramoops-console=0x100000", "pagani-ramoops-pmsg=0x200000", "sheng-vsync=60", "sheng-vsync-fixed=1", "offline-mobile-graphics-load=1", "offline-legacy-register=1", "offline-legacy-phase=4", "offline-legacy-gop=1", "offline-legacy-pm=1", "offline-legacy-validate=1", "offline-legacy-transfer=1", "offline-legacy-cpu-present=1", "sheng-aks=1", "offline-key-events=1", "-no_corpses", "kt_fixed_zones=240", "startup_debug=0", "sheng-smp=1", "pagani-gpu=1", "sheng-gpu-addon=1", "sheng-gpu-metal-opens=0", "sheng-fb-gpu=1", "pagani-fb-flip=1", "pagani-gpu-va=4", "pagani-gpu-trace=1", "pagani-gpu-status=3", "pagani-gpu-pool=256", "sheng-log=1", "sheng-log-reserve=512", "root-unverified=1", "initproc-no-panic=1"]
-trust_cache_sha256 = ["7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7"]
 
 [package]
 unixnu = "../UniXNU"
 
 [package.defconfig]
 "ipados-17.7.11-21H461" = "piano_defconfig"
+"macos-27.3-26C5035r" = "piano_macos_defconfig"
 
 [payload.adt]
-ipad_identity = true
 unique_chip_id = "required"
-chip_id = "0x8011"
-# DarwinBoot allocates its own 4 GiB window, as on the 13T.
-owned_memory_size = "0x100000000"
 packed_data_ramdisk = true
-# The APFS root volume of the 21H461 OS image (profile [root] os_volume_uuid).
-root_match_volume_uuid = "04769D26-2CA0-4825-B443-E2E5F88300F2"
 
-# iPadOS root: GPT entry unixnu on LUN 0 (sda36), 32 GiB split from the old
+# Root partition: GPT entry unixnu on LUN 0 (sda36), 32 GiB split from the old
 # 64 GiB linux partition on 2026-11-05. NativeUfs finds it by name.
 [userdata]
 partition = "unixnu"
 first_lba = 107643392
 last_lba = 116031999
 lba_bytes = 4096
+
+# iPadOS 17.7.11, on the SM8750 UniXNU fork (IssacL04/UniXNU_Enc3l) with the
+# OnePlus 13T drivers (IssacL04/UniXNU-Pagani_SM8750): UFS root, display,
+# touch and the A830 GPU.
+[os_overrides."ipados-17.7.11-21H461".board]
+# The Pagani display and input build scripts read the package as kits/oneplus13t.
+kit = "oneplus13t"
+
+[os_overrides."ipados-17.7.11-21H461".ipsw]
+fetch = ["AppleLogo", "KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustCache"]
+
+[os_overrides."ipados-17.7.11-21H461".components]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "GopFramebuffer", "BootProgress", "ShengPlatformPower", "NativeUfs", "NativeVirtioBlock", "NativeRamBlock", "PaganiVerifiedRoot", "NativeMobileDisplay", "Stage7Probe", "NativeKeyStoreEvents", "PaganiInput", "PaganiPanel"]
+
+[os_overrides."ipados-17.7.11-21H461".kernel]
+defconfig = "piano_defconfig"
+archives = [
+  "build-corecrypto-14.py",
+  "build-corecrypto-14.py --namespace",
+  "build-libpthread-kernel.py",
+  "component:ArmCpu",
+  "component:ArmDTPlatform",
+  "component:SoftwareAES",
+  "build-software-aes-bindings.py",
+  "component:NativeUfs",
+  "build-ufs-storage-bindings.py --kernelcache ../../../../ipsw/21H461/kernelcache.decompressed",
+  "component:NativeVirtioBlock",
+  "component:NativeRamBlock", "component:Adreno830", "build-piano-gpu.py",
+  "component:ShengPlatformPower",
+  "build-pagani-verified-root-probe.py --component os --include-systemos",
+  "component:NativeMobileDisplay",
+  "build-boot-progress.py",
+  "build-mockfs-fixture.py",
+]
+config_fragments = ["arch:configs/common.config", "soc:configs/sm8750.config", "os:configs/ipados.config"]
+
+# Apple kexts packed with the kernel, as on the OnePlus 13T. AMFI is needed
+# by trust_cache_init; ApplePMGR gets its nub from ShengPlatformPower
+# (sheng-pmgr=2), otherwise AMFI panics "No PMGR?" at setconf.
+[os_overrides."ipados-17.7.11-21H461".kernel.prelink]
+tool = "kits/XnuPrelink/emit_prelink.py"
+kernel = "build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf"
+kernelcache_sha256 = "f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7"
+slide = "-0x1000000"
+early_security_init = "com.apple.driver.AppleMobileFileIntegrity=0xfffffff005ab4ae0"
+roots = [
+  "com.apple.iokit.IOStorageFamily", "com.apple.filesystems.apfs",
+  "com.apple.driver.AppleMobileFileIntegrity", "com.apple.kext.CoreTrust",
+  "com.apple.security.sandbox", "com.apple.driver.ApplePMGR",
+  "com.apple.AppleFSCompression.AppleFSCompressionTypeZlib",
+  "com.apple.iokit.IOSurface", "com.apple.iokit.IOMobileGraphicsFamily", "com.apple.iokit.IOGPUFamily",
+  "com.apple.iokit.IOHIDFamily", "com.apple.iokit.IOHIDEventDriver",
+]
+
+[os_overrides."ipados-17.7.11-21H461".payload]
+title = "Xiaomi Pad 8 Pro: XNU first boot"
+# Eight CPUs and the A830 GPU, as on the OnePlus 13T.
+kernel_args = ["-v", "serial=0", "debug=0x14e", "cpus=8", "sheng-pmgr=2", "native-ufs-root=1", "native-ufs-diagnostics=1", "offline-apfs-load=1", "pagani-ramoops=1", "pagani-ramoops-pa=0xa3600000", "pagani-ramoops-console=0x100000", "pagani-ramoops-pmsg=0x200000", "sheng-vsync=60", "sheng-vsync-fixed=1", "offline-mobile-graphics-load=1", "offline-legacy-register=1", "offline-legacy-phase=4", "offline-legacy-gop=1", "offline-legacy-pm=1", "offline-legacy-validate=1", "offline-legacy-transfer=1", "offline-legacy-cpu-present=1", "sheng-aks=1", "offline-key-events=1", "-no_corpses", "kt_fixed_zones=240", "startup_debug=0", "sheng-smp=1", "pagani-gpu=1", "sheng-gpu-addon=1", "sheng-gpu-metal-opens=0", "sheng-fb-gpu=1", "pagani-fb-flip=1", "pagani-gpu-va=4", "pagani-gpu-trace=1", "pagani-gpu-status=3", "pagani-gpu-pool=256", "sheng-log=1", "sheng-log-reserve=512", "root-unverified=1", "initproc-no-panic=1"]
+trust_cache_sha256 = ["7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7"]
+
+[os_overrides."ipados-17.7.11-21H461".payload.adt]
+ipad_identity = true
+chip_id = "0x8011"
+# DarwinBoot allocates its own 4 GiB window, as on the 13T.
+owned_memory_size = "0x100000000"
+# The APFS root volume of the 21H461 OS image (profile [root] os_volume_uuid).
+root_match_volume_uuid = "04769D26-2CA0-4825-B443-E2E5F88300F2"
+
+[os_overrides."ipados-17.7.11-21H461".userdata]
 windows = [
   { name = "OS", component = "OS" },
   { name = "SystemOS", component = "Cryptex1,SystemOS" },
 ]
+
+# macOS 27.3, on the UniXNU core (UniXNU/UniXNU, profiles/os/macos-27.3-26C5035r)
+# with its own components; the layout follows the Xiaomi Pad 6S Pro board
+# (UniXNU/UniXNU-sheng, BSD-2-Clause-Patent). First stage: the macOS kernel
+# collection from RAM with the boot text on the UEFI framebuffer (vc-text=1),
+# one CPU, no storage driver, no GPU. docs/MACOS.md has the build line.
+[os_overrides."macos-27.3-26C5035r".board]
+kit = "piano"
+description = "Xiaomi Pad 8 Pro: macOS first boot from RAM"
+
+[os_overrides."macos-27.3-26C5035r".components]
+include = ["ArmDTPlatform", "ArmCpu", "XnuPrelink", "DarwinBoot", "RamBlock", "GopFramebuffer", "AppleKeyStoreState", "SoftwareAES"]
+
+[os_overrides."macos-27.3-26C5035r".kernel]
+defconfig = "piano_macos_defconfig"
+# The SoC and device series are written for the iPadOS 17 kernel (xnu-10063);
+# patches/xnu-12377 takes the SoC place for this kernel. No SMP patch yet:
+# this stage runs one CPU.
+patch_series = ["arch:patches/xnu/series", "device:patches/xnu-12377/series", "os:patches/xnu/series"]
+config_fragments = ["arch:configs/common.config", "soc:configs/sm8750.config", "os:configs/macos.config"]
+# The display, key event and AES services of this kernel are built by one
+# board script on the Pad 6S Pro (build-gop-legacy-display-27.py); the piano
+# one is not written yet, so this stage has the boot text only.
+archives = [
+  "build-corecrypto-14.py",
+  "build-corecrypto-14.py --namespace",
+  "component:ArmDTPlatform",
+  "component:ArmCpu",
+  "build-libpthread-kernel.py",
+  "component:RamBlock",
+  "component:AppleKeyStoreState",
+  "component:SoftwareAES",
+]
+
+[os_overrides."macos-27.3-26C5035r".payload]
+# The macOS kernel collection is about 137 MiB.
+size_mib = 200
+title = "Xiaomi Pad 8 Pro: macOS first boot"
+# timebase-hz: the SM8750 architected timer runs at 19.2 MHz and macOS
+# userspace expects 24 MHz. One CPU and the boot text until launchd runs.
+kernel_args = ["debug=0x14e", "cpus=1", "kt_fixed_zones=120", "-no_slto_panic", "use_contiguous_hint=0", "offline-legacy-register=1", "offline-legacy-gop=1", "offline-legacy-unit-scale=2", "offline-legacy-pm=1", "offline-legacy-validate=1", "offline-legacy-transfer=1", "offline-legacy-cpu-present=1", "offline-legacy-phase=4", "offline-key-events=1", "aks=1", "log=1", "disable-watchdogd=1", "vc-text=1", "exec-log=1", "apfs-boot-shim=1", "timebase-hz=24000000"]
+
+[os_overrides."macos-27.3-26C5035r".payload.adt]
+# T6050, the chip of Mac17,11 (the profile's identity).
+chip_id = "6050"
+# 6 GiB is the most the 4 KiB bootstrap tables map.
+owned_memory_size = "0x180000000"
+
+[os_overrides."macos-27.3-26C5035r".payload.runtime]
+target = "macos27"
+build = "26C5035r"
