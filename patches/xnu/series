@@ -1,2 +1,5 @@
 # piano XNU patches, applied after the arch, SoC and OS series.
 early-boot-progress.patch
+zzz-initproc-no-panic.patch
+zzz-root-unverified.patch
+zzz-systemos-volume-retry.patch
