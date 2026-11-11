@@ -9,3 +9,6 @@ sheng-platform-power.patch
 # zzzz-sheng-ipados27-bringup.patch (BSD-2-Clause-Patent); XnuPrelink binds
 # AMFI's stack-room reads of the 26C5035r fileset to unixnu_kernel_stack_shift.
 kernel-stack-shift.patch
+# sm8750-smp.patch: secondary CPUs find their data by MPIDR with the SM8750
+# layout (core in Affinity1, cluster in Affinity2); written for this kernel.
+sm8750-smp.patch

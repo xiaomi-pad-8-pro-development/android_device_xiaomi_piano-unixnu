@@ -166,8 +166,7 @@ include = ["ArmDTPlatform", "ArmCpu", "XnuPrelink", "DarwinBoot", "GopFramebuffe
 [os_overrides."macos-27.3-26C5035r".kernel]
 defconfig = "piano_macos_defconfig"
 # The SoC and device series are written for the iPadOS 17 kernel (xnu-10063);
-# patches/xnu-12377 takes the SoC place for this kernel. No SMP patch yet:
-# this stage runs one CPU.
+# patches/xnu-12377 takes the SoC place for this kernel.
 patch_series = ["arch:patches/xnu/series", "device:patches/xnu-12377/series", "os:patches/xnu/series"]
 config_fragments = ["arch:configs/common.config", "soc:configs/sm8750.config", "os:configs/macos.config"]
 # The display, key event and AES services of this kernel are built by one
@@ -188,8 +187,8 @@ archives = [
 size_mib = 200
 title = "Xiaomi Pad 8 Pro: macOS first boot"
 # timebase-hz: the SM8750 architected timer runs at 19.2 MHz and macOS
-# userspace expects 24 MHz. One CPU and the boot text until launchd runs.
-kernel_args = ["debug=0x14e", "cpus=1", "kt_fixed_zones=120", "-no_slto_panic", "use_contiguous_hint=0", "offline-legacy-register=1", "offline-legacy-gop=1", "offline-legacy-unit-scale=2", "offline-legacy-pm=1", "offline-legacy-validate=1", "offline-legacy-transfer=1", "offline-legacy-cpu-present=1", "offline-legacy-phase=4", "offline-key-events=1", "aks=1", "log=1", "disable-watchdogd=1", "vc-text=1", "exec-log=1", "apfs-boot-shim=1", "timebase-hz=24000000"]
+# userspace expects 24 MHz. All eight CPUs (smp=1, sm8750-smp.patch).
+kernel_args = ["debug=0x14e", "smp=1", "armcpu-spi-ipi=1", "armcpu-self-ipi=1", "kt_fixed_zones=120", "-no_slto_panic", "use_contiguous_hint=0", "offline-legacy-register=1", "offline-legacy-gop=1", "offline-legacy-unit-scale=2", "offline-legacy-pm=1", "offline-legacy-validate=1", "offline-legacy-transfer=1", "offline-legacy-cpu-present=1", "offline-legacy-phase=4", "offline-key-events=1", "aks=1", "log=1", "disable-watchdogd=1", "vc-text=1", "exec-log=1", "apfs-boot-shim=1", "timebase-hz=24000000"]
 
 [os_overrides."macos-27.3-26C5035r".payload.adt]
 # T6050, the chip of Mac17,11 (the profile's identity).

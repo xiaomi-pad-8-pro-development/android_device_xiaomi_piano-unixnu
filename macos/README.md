@@ -72,7 +72,7 @@ D=<repo>/.cache/macos-device O="-D $D --out out/piano-macos --os macos-27.3-26C5
 ```
 
 Stage 1 is the kernel collection from RAM with the boot text on the UEFI
-framebuffer, one CPU. Not in it yet: the UFS root, SystemOS and Data mounts
+framebuffer, all eight CPUs. Not in it yet: the UFS root, SystemOS and Data mounts
 (and so the RAM disk and software AES), the display and key event services
-(the Pad 6S Pro builds them in build-gop-legacy-display-27.py), SMP and the GPU.
+(the Pad 6S Pro builds them in build-gop-legacy-display-27.py) and the GPU.
 `glue/PianoMacGlue.c` holds the board hooks the macOS kernel patches call.
