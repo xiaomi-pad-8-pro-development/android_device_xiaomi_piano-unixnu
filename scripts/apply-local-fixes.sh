@@ -23,6 +23,14 @@ done
 # Stage 7 display: NativeGOPPresenter is linked once, not twice.
 apply "$unixnu" "$here/patches/local/sm8750-stage7-display-once.patch"
 
+# Adreno830 needs ArmSmmu4K e923329 (feeds.toml); checked out under .cache.
+smmu="$here/.cache/kits/ArmSmmu4K"
+smmu_commit=e923329e74f18b11e63c155e470c970ebad3b6e2
+[ -d "$smmu/.git" ] || git clone -q --no-checkout https://github.com/UniXNU/ArmSmmu4K.git "$smmu"
+git -C "$smmu" cat-file -e "$smmu_commit^{commit}" 2>/dev/null ||
+	git -C "$smmu" fetch -q https://github.com/UniXNU/ArmSmmu4K.git "$smmu_commit"
+git -C "$smmu" checkout -q --detach "$smmu_commit"
+
 # UniXNU core (macOS): accept the stock dtb, several compiled trees back to
 # back. Only for the core checkout; the SM8750 fork already does.
 if [ -f "$unixnu/profiles/os/macos-27.3-26C5035r/profile.toml" ]; then

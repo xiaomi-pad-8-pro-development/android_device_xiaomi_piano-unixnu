@@ -4,61 +4,75 @@ kind = "soc"
 git = "https://github.com/IssacL04/UniXNU-sm8750-common.git"
 commit = "feaa135df4763e3c19a155402e6b17b124a12e13"
 
-# The 13T early screen console, from the pinned modules/Pagani checkout. The
+# The 13T early screen console, from the pinned modules/Piano checkout (UniXNU-Piano-Drivers). The
 # catalog entry links the whole repository instead of drivers/BootProgress.
 [[source]]
 name = "BootProgress"
 kind = "driver"
-local = "modules/Pagani/drivers/BootProgress"
+local = "modules/Piano/drivers/BootProgress"
 
 
 # The 13T PMGR nub for AMFI (sheng-pmgr=2), same checkout.
 [[source]]
 name = "ShengPlatformPower"
 kind = "driver"
-local = "modules/Pagani/drivers/ShengPlatformPower"
+local = "modules/Piano/drivers/ShengPlatformPower"
 
 [[source]]
 name = "NativeUfs"
 kind = "driver"
-local = "modules/Pagani/drivers/NativeUfs"
+local = "modules/Piano/drivers/NativeUfs"
 
 [[source]]
 name = "NativeVirtioBlock"
 kind = "driver"
-local = "modules/Pagani/drivers/NativeVirtioBlock"
+local = "modules/Piano/drivers/NativeVirtioBlock"
 
 [[source]]
 name = "NativeRamBlock"
 kind = "driver"
-local = "modules/Pagani/drivers/NativeRamBlock"
+local = "modules/Piano/drivers/NativeRamBlock"
 
 [[source]]
 name = "PaganiVerifiedRoot"
 kind = "kit"
-local = "modules/Pagani/kits/PaganiVerifiedRoot"
+local = "modules/Piano/kits/PaganiVerifiedRoot"
 
 [[source]]
 name = "NativeMobileDisplay"
 kind = "driver"
-local = "modules/Pagani/drivers/NativeMobileDisplay"
+local = "modules/Piano/drivers/NativeMobileDisplay"
 
 [[source]]
 name = "Stage7Probe"
 kind = "driver"
-local = "modules/Pagani/drivers/Stage7Probe"
+local = "modules/Piano/drivers/Stage7Probe"
 
 [[source]]
 name = "NativeKeyStoreEvents"
 kind = "driver"
-local = "modules/Pagani/drivers/NativeKeyStoreEvents"
+local = "modules/Piano/drivers/NativeKeyStoreEvents"
 
 [[source]]
 name = "PaganiInput"
 kind = "driver"
-local = "modules/Pagani/drivers/PaganiInput"
+local = "modules/Piano/drivers/PaganiInput"
 
 [[source]]
 name = "PaganiPanel"
 kind = "driver"
-local = "modules/Pagani/drivers/PaganiPanel"
+local = "modules/Piano/drivers/PaganiPanel"
+
+# A830 GPU driver with the piano board glue (drivers/Adreno830/board), same checkout.
+[[source]]
+name = "Adreno830"
+kind = "driver"
+local = "modules/Piano/drivers/Adreno830"
+
+# Adreno830 uses the fixed-size SMMU arena (mapping, capacity_pages) that
+# ArmSmmu4K dropped in 48dbd6c; scripts/apply-local-fixes.sh checks out the
+# kit just before it here. A local source wins over the bundled kit.
+[[source]]
+name = "ArmSmmu4K"
+kind = "kit"
+local = ".cache/kits/ArmSmmu4K"

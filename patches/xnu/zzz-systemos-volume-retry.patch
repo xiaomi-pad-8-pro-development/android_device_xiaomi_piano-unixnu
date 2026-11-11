@@ -1,9 +1,8 @@
 --- a/bsd/kern/kern_exec.c
 +++ b/bsd/kern/kern_exec.c
-@@ -7659,8 +7659,16 @@
+@@ -7659,7 +7659,15 @@
  	if (!root_authorized) goto done;
  	native_owner_cache_stage = 1;
- 	boot_progress_root("SystemOS volume query enter", volume, 0);
 -	if (!native_verified_block_volume_device(volume, &selected, device_path,
 -	    sizeof(device_path))) goto done;
 +	/* Bring-up: the SystemOS volume media is published asynchronously while APFS probes the

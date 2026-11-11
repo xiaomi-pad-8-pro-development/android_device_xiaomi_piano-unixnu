@@ -89,7 +89,7 @@ kit = "oneplus13t"
 fetch = ["AppleLogo", "KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustCache"]
 
 [os_overrides."ipados-17.7.11-21H461".components]
-include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "GopFramebuffer", "BootProgress", "ShengPlatformPower", "NativeUfs", "NativeVirtioBlock", "NativeRamBlock", "PaganiVerifiedRoot", "NativeMobileDisplay", "Stage7Probe", "NativeKeyStoreEvents", "PaganiInput", "PaganiPanel"]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot", "Sm8750Platform", "GopFramebuffer", "BootProgress", "ShengPlatformPower", "NativeUfs", "NativeVirtioBlock", "NativeRamBlock", "PaganiVerifiedRoot", "NativeMobileDisplay", "Stage7Probe", "NativeKeyStoreEvents", "PaganiInput", "PaganiPanel", "Adreno830", "AdrenoMetal", "AdrenoFirmware"]
 
 [os_overrides."ipados-17.7.11-21H461".kernel]
 defconfig = "piano_defconfig"
