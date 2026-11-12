@@ -27,6 +27,9 @@ DISABLED_JOBS = {
     'com.apple.PerfPowerServices': ['/usr/libexec/PerfPowerServices'],
     'com.apple.iomfb_fdr_loader': ['/usr/bin/IOMFB_FDR_Loader', '--launchd_boot'],
     'com.apple.iconservices.iconservicesagent': ['/System/Library/CoreServices/iconservicesagent'],
+    # FairPlay needs the Secure Enclave: without it the daemon is relaunched and exits every few seconds (111 times in a
+    # 2026-11-12 boot), which stalls Settings and the home screen. Its arguments are not pinned (None).
+    'com.apple.fairplayd.A2': None,
 }
 DATA_BYTES = 1024**3
 COMPAT_FIXUPS = (
@@ -89,7 +92,7 @@ def prepare_userspace(target):
 def prepare_launch_policy(target, daemons):
     for label, arguments in DISABLED_JOBS.items():
         job = plistlib.loads((daemons / (label + '.plist')).read_bytes())
-        if job.get('Label') != label or job.get('ProgramArguments') != arguments:
+        if job.get('Label') != label or (arguments is not None and job.get('ProgramArguments') != arguments):
             raise ValueError('Unexpected original launch policy: ' + label)
         if label == 'com.apple.watchdogd' and job.get('_PanicOnCrash', {}).get('PanicOnConsecutiveCrash') is not True:
             raise ValueError('Unexpected original watchdog crash policy')
