@@ -1,5 +1,6 @@
-// piano: OnePlus 13T values, only so PaganiInput/PaganiPanel compile for the
-// display driver. Unused: pagani-touch/buttons/panel are not set on piano.
+// piano: the keys are the piano's own (live DT, below); touch and panel are
+// still the OnePlus 13T values, only so PaganiInput/PaganiPanel compile.
+// pagani-touch and pagani-panel stay off on piano.
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 // PKX110 live.dtb and AA594_P_7_A0020 panel configuration; installed as kits/oneplus13t.
 #pragma once
@@ -36,14 +37,15 @@
 #define PAGANI_SPMI_CNFG 0xc42d000ULL
 #define PAGANI_SPMI_OBS 0xc440000ULL
 #define PAGANI_SPMI_EE 0
+// piano keys (live DT): pmk8550 PON (SID 0, 0x1300) KPDPWR bit 7 is Power and
+// RESIN bit 6 is Volume Down; Volume Up is pm8550 (SID 1) GPIO 6, 0x8d00,
+// active low (gpio-keys vol_up, debounce 32 ms). No Plus key.
 #define PAGANI_PON_PPID 0x013
 #define PAGANI_GPIO_PPID 0x18d
 #define PAGANI_PON_POWER 0x80
 #define PAGANI_PON_VOLUME_UP 0x40
+#define PAGANI_PON_RESIN_VOLUME_DOWN 1
 #define PAGANI_GPIO_VOLUME_DOWN 1
-// Plus key (left side, Android gpio-keys "oplus_magic_buttom", BTN_TRIGGER_HAPPY32): TLMM GPIO 97, active low with an external
-// pull-up; the Android pinctrl state is function gpio, bias-disable, 6 mA (drive field 2), and gpio-keys debounces it for 32 ms.
-#define PAGANI_PLUS_KEY_GPIO 97
 #define PAGANI_PLUS_KEY_DRIVE 2
 #define PAGANI_DSI_BASE 0xae94000ULL
 #define PAGANI_BRIGHTNESS_MAX 0xdbb
