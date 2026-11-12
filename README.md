@@ -19,6 +19,11 @@ still scrolls slowly (about 25 fps) and widgets stay white.
 macOS 27.3 has its board tables and compiles, but its kernel does not link
 yet ([macos/README.md](macos/README.md)).
 
+![iPadOS home screen on the Pad 8 Pro, with the test overlay](docs/images/home-screen.jpg)
+
+The home screen from a RAM boot, with the test overlay (keys, touch, GPU
+and frame rate) on top.
+
 ## Layout
 
 iPadOS and macOS share the hardware half of this repository; see
