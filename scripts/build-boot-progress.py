@@ -26,7 +26,7 @@ def main():
     # pagani-reset-after, pagani-panic-reset), GunyahWdog.c (pagani-wdog: the hypervisor watchdog that resets a hung
     # kernel; it logs through RamoopsLog) and UfsLog.c (sheng-log: RamoopsLog's snapshots on UFS, the strong boot_log_export_put)
     # when the driver tree has them; all run on the early, IRQ and panic paths.
-    names = ['BootProgress', 'PianoProgressStubs']
+    names = ['BootProgress', 'PianoProgressStubs', 'PianoUsbConsole']
     if (source / 'RamoopsLog.c').is_file():
         names.append('RamoopsLog')
         # piano: no UFS driver yet, so no UfsLog (its symbols come from PianoProgressStubs.c).
@@ -38,7 +38,7 @@ def main():
     objects = []
     for name in names:
         obj = output / f'{name}.o'
-        path = root / 'scripts/PianoProgressStubs.c' if name == 'PianoProgressStubs' else source / f'{name}.c'
+        path = root / f'scripts/{name}.c' if name.startswith('Piano') else source / f'{name}.c'
         command = compile_command(record, path, obj)
         # Bootstrap records disable the hooks; this object supplies their enabled implementation.
         args = iter(command)

@@ -1,0 +1,14 @@
+--- a/bsd/kern/bsd_init.c	2026-11-12 03:59:36
++++ b/bsd/kern/bsd_init.c	2026-11-12 03:59:36
+@@ -823,6 +823,11 @@
+ 		extern void piano_test_autoreset_start(void);
+ 		piano_test_autoreset_start();
+ 	}
++	{
++		/* piano test images: USB serial console (scripts/PianoUsbConsole.c). */
++		extern void piano_usb_console_start(void);
++		piano_usb_console_start();
++	}
+ 
+ 	/*
+ 	 * Initialize the calendar.

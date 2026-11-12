@@ -1,0 +1,57 @@
+--- a/osfmk/arm64/sleh.c	2026-11-12 03:04:34
++++ b/osfmk/arm64/sleh.c	2026-11-12 03:04:34
+@@ -164,6 +164,46 @@
+ 
+ static void handle_breakpoint(arm_saved_state_t *, uint32_t) __dead2;
+ 
++/*
++ * piano bring-up: a user process that stops on a BRK (Swift fatalError,
++ * os_crash, __builtin_trap) only leaves "status=5 ns=2 code=5" on the
++ * boot screen. Print where it stopped, with the shared cache slide taken
++ * off, so the address can be looked up in the unslid dyld shared cache.
++ */
++#include <vm/vm_shared_region.h>
++extern void boot_progress_stage(const char *);
++extern char *proc_best_name(struct proc *);
++static void
++piano_report_user_trap(arm_saved_state_t *state, uint32_t esr)
++{
++	if (!PSR64_IS_USER(get_saved_state_cpsr(state))) {
++		return;
++	}
++	char line[160];
++	uint64_t pc = get_saved_state_pc(state), lr = get_saved_state_lr(state);
++	uint64_t slide = 0;
++	vm_shared_region_t sr = vm_shared_region_get(current_task());
++	if (sr != NULL) {
++		slide = sr->sr_slide;
++		vm_shared_region_deallocate(sr);
++	}
++	struct proc *p = (struct proc *)get_bsdtask_info(current_task());
++	snprintf(line, sizeof(line), "trap %.16s brk %x pc %llx lr %llx", p ? proc_best_name(p) : "?",
++	    ISS_BRK_COMMENT(esr), pc - slide, lr - slide);
++	printf("%s slide %llx\n", line, slide);
++	/* x19..x22 and the object x19 points at (FBSDisplayMode fields) */
++	uint64_t obj[10] = {0};
++	uint64_t x19 = get_saved_state_reg(state, 19);
++	int cerr = copyin(x19, obj, sizeof(obj));
++	printf("trap regs x19 %llx x20 %llx x21 %llx x22 %llx copyin %d\n", x19,
++	    get_saved_state_reg(state, 20), get_saved_state_reg(state, 21),
++	    get_saved_state_reg(state, 22), cerr);
++	for (int i = 0; i < 10; i += 2) {
++		printf("trap obj+%02x %llx %llx\n", i * 8, obj[i], obj[i + 1]);
++	}
++	boot_progress_stage(line);
++}
++
+ typedef void (*abort_inspector_t)(uint32_t, fault_status_t *, vm_prot_t *);
+ static void inspect_instruction_abort(uint32_t, fault_status_t *, vm_prot_t *);
+ static void inspect_data_abort(uint32_t, fault_status_t *, vm_prot_t *);
+@@ -1233,6 +1273,7 @@
+ 	mach_msg_type_number_t     numcodes  = 2;
+ 
+ 	boot_progress_user_breakpoint(state, esr);
++	piano_report_user_trap(state, esr);
+ #if __has_feature(ptrauth_calls)
+ 	if (ESR_EC(esr) == ESR_EC_BRK_AARCH64 &&
+ 	    brk_comment_is_ptrauth(ISS_BRK_COMMENT(esr))) {

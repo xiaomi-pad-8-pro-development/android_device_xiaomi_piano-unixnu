@@ -3,3 +3,6 @@ early-boot-progress.patch
 zzz-initproc-no-panic.patch
 zzz-root-unverified.patch
 zzz-systemos-volume-retry.patch
+piano-user-trap-report.patch
+piano-test-autoreset.patch
+piano-usb-console.patch
