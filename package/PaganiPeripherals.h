@@ -1,11 +1,20 @@
-// piano: the keys are the piano's own (live DT, below); touch and panel are
-// still the OnePlus 13T values, only so PaganiInput/PaganiPanel compile.
-// pagani-touch and pagani-panel stay off on piano.
+// piano: the keys and touch are the piano's own (live DT, below); the panel
+// values are still the OnePlus 13T ones, only so PaganiPanel compiles, and
+// pagani-panel stays off on piano.
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 // PKX110 live.dtb and AA594_P_7_A0020 panel configuration; installed as kits/oneplus13t.
 #pragma once
 #define PAGANI_GCC_BASE 0x100000ULL
-#define PAGANI_TOUCH_SE 0xa90000ULL
+// piano touch (live DT spi@a88000/novatek@0, pianoPkg TouchProbe): NT36532 THP on QUP1 SE2, SPI pins 40-43 (qup1_se2,
+// 6 mA, no pull), frame-ready IRQ GPIO 162, 19.2 MHz, apps SMMU stream 0xa3 like every QUP1 engine. The touch rails
+// come up with the panel, and the chip has no reset line in the DT. The engine clock is voted like the 13T's SE4,
+// with gcc_qupv3_wrap1_s2_clk (vote bit 24, halt 0x1827c) in place of s4.
+#define PAGANI_TOUCH_NVT 1
+#define PAGANI_TOUCH_SPI_FUNC 1
+#define PAGANI_TOUCH_CLK_DIV 6
+#define PAGANI_TOUCH_GCC_VOTE 0x013c0000u
+#define PAGANI_TOUCH_GCC_BRANCHES {0x2315c,0x23148,0x23140,0x23144,0x1827c}
+#define PAGANI_TOUCH_SE 0xa88000ULL
 #define PAGANI_TOUCH_WRAPPER 0xac0000ULL
 #define PAGANI_TOUCH_SMMU 0x15000000ULL
 #define PAGANI_TOUCH_SMMU_SIZE 0x100000
@@ -13,11 +22,12 @@
 #define PAGANI_TLMM_GPIO(n) (0xf100000ULL+0x1000ULL*(n))
 #define PAGANI_TOUCH_RESET 161
 #define PAGANI_TOUCH_ATTN 162
-#define PAGANI_TOUCH_PINS {48,49,50,51,PAGANI_TOUCH_RESET,PAGANI_TOUCH_ATTN}
-#define PAGANI_TOUCH_DRIVES {2,1,2,1,3,3}
+#define PAGANI_TOUCH_LCD_ID 100   // panel vendor strap: 0 CSOT, 1 BOE
+#define PAGANI_TOUCH_PINS {40,41,42,43,PAGANI_TOUCH_RESET,PAGANI_TOUCH_ATTN}
+#define PAGANI_TOUCH_DRIVES {2,2,2,2,0,0}
 #define PAGANI_TOUCH_RESET_MS 10
 #define PAGANI_TOUCH_STARTUP_MS 100
-#define PAGANI_TOUCH_HZ 19000000
+#define PAGANI_TOUCH_HZ 19200000
 #define PAGANI_TOUCH_CS_DELAY 50
 #define PAGANI_TOUCH_WORD_DELAY 0
 // Android live DT and cmd-db: apps DRV-2, ldob4 (0x40800), ldob16 (0x41900).
