@@ -8,8 +8,8 @@
 
 uint32_t pagani_stall_on;
 
-/* Statistics of 13T drivers piano does not build. */
-volatile uint32_t native_adreno_pool_stats[8];
+/* GPU statistics and hooks: weak, so the Adreno830 archive replaces them when it is linked. */
+__attribute__((weak)) volatile uint32_t native_adreno_pool_stats[8];
 
 /* Stall-probe hooks of the 13T kernel patches; unused while pagani_stall_on is 0. */
 struct boot_progress_stall_vm;
@@ -39,7 +39,7 @@ void *boot_progress_stall_task_find(const char *name, int32_t pid, struct boot_p
 void boot_progress_stall_task_release(void *task) { (void)task; }
 
 /* GPU frame hint of the 13T Adreno 830 driver; no GPU driver on piano yet. */
-uint32_t adreno830_cpu_hint(void) { return 0; }
+__attribute__((weak)) uint32_t adreno830_cpu_hint(void) { return 0; }
 
 /* Optional sheng launchd watchdog policy after the Data mount; the 13T
  * drops the call, piano does nothing. */
@@ -51,7 +51,7 @@ int sheng_boot_watchdog_policy(void *proc, unsigned long long scratch)
 
 /* No Adreno830 GPU driver on piano yet: GPU tracing is off. */
 struct NativeGpuPixelPiece;
-int native_gpu_trace_enabled(void) { return 0; }
-void native_gpu_trace_record(unsigned event, unsigned pid, const unsigned long long *values, unsigned count)
+__attribute__((weak)) int native_gpu_trace_enabled(void) { return 0; }
+__attribute__((weak)) void native_gpu_trace_record(unsigned event, unsigned pid, const unsigned long long *values, unsigned count)
 { (void)event; (void)pid; (void)values; (void)count; }
-int native_gpu_pixel_put(const struct NativeGpuPixelPiece *piece, unsigned pid) { (void)piece; (void)pid; return 1; }
+__attribute__((weak)) int native_gpu_pixel_put(const struct NativeGpuPixelPiece *piece, unsigned pid) { (void)piece; (void)pid; return 1; }
